@@ -1,0 +1,17 @@
+      - args:
+        - --ignore-db-dir=lost+found
+        - --datadir
+        - /var/lib/mysql
+        env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "true"
+        - name: MYSQL_INNODB_FORCE_RECOVERY
+          value: "1"
+        image: gcr.io/ml-pipeline/mysql:5.7-debian
+        imagePullPolicy: IfNotPresent
+        name: mysql
+        ports:
+        - containerPort: 3306
+          name: mysql
+          protocol: TCP
+        resources:
