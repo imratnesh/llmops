@@ -110,6 +110,264 @@ You can monitor the pipeline execution through:
 - Programmatically using the client
 - Kubernetes dashboard
 
+# Kubeflow Pipeline Project
+
+[Previous sections remain the same...]
+
+## 🛠️ Troubleshooting Guide
+
+### 1. Installation Commands
+
+#### Docker Installation
+```bash
+# For macOS
+brew install docker
+
+# For Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+```
+
+#### Minikube Installation
+```bash
+# For macOS
+brew install minikube
+
+# For Ubuntu/Debian
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+```
+
+#### Kubeflow Installation
+```bash
+# Install kfctl
+curl -L https://github.com/kubeflow/kfctl/releases/download/v1.2.0/kfctl_v1.2.0-0-gbc038f9_linux.tar.gz | tar xz
+sudo mv kfctl /usr/local/bin/
+
+# Download Kubeflow config
+export KF_NAME=my-kubeflow
+export BASE_DIR=/opt
+export KF_DIR=${BASE_DIR}/${KF_NAME}
+mkdir -p ${KF_DIR}
+cd ${KF_DIR}
+kfctl init ${KF_NAME} --config=https://raw.githubusercontent.com/kubeflow/manifests/v1.2-branch/kfdef/kfctl_k8s_istio.v1.2.0.yaml
+kfctl generate all -V
+kfctl apply all -V
+```
+
+### 2. Common Commands
+
+#### Minikube Commands
+```bash
+# Start Minikube
+minikube start --cpus 4 --memory 8192
+
+# Check Minikube Status
+minikube status
+
+# Stop Minikube
+minikube stop
+
+# Delete Minikube
+minikube delete
+
+# Get Minikube IP
+minikube ip
+
+# Enable Ingress
+minikube addons enable ingress
+```
+
+#### Kubernetes Commands
+```bash
+# Check Cluster Status
+kubectl cluster-info
+
+# Check Nodes
+kubectl get nodes
+
+# Check All Resources in Kubeflow Namespace
+kubectl get all -n kubeflow
+
+# Check Pods
+kubectl get pods -n kubeflow
+
+# Check Services
+kubectl get svc -n kubeflow
+
+# Check Deployments
+kubectl get deployments -n kubeflow
+
+# Check ConfigMaps
+kubectl get configmaps -n kubeflow
+
+# Check Secrets
+kubectl get secrets -n kubeflow
+```
+
+#### Kubeflow Pipeline Commands
+```bash
+# Port Forward for Kubeflow UI
+kubectl port-forward -n kubeflow svc/ml-pipeline-ui 8080:80
+
+# Port Forward for Pipeline API
+kubectl port-forward -n kubeflow svc/ml-pipeline 8888:8888
+
+# Check Pipeline Pods
+kubectl get pods -n kubeflow | grep pipeline
+
+# Check Pipeline Logs
+kubectl logs -n kubeflow <pipeline-pod-name>
+
+# Check Pipeline Service
+kubectl get svc -n kubeflow | grep pipeline
+```
+
+### 3. Troubleshooting Steps
+
+#### 1. Check System Requirements
+```bash
+# Check Docker Version
+docker --version
+
+# Check Minikube Version
+minikube version
+
+# Check kubectl Version
+kubectl version
+
+# Check System Resources
+kubectl describe nodes
+```
+
+#### 2. Verify Kubeflow Installation
+```bash
+# Check Kubeflow Namespace
+kubectl get namespace kubeflow
+
+# Check All Resources
+kubectl get all -n kubeflow
+
+# Check Pod Status
+kubectl get pods -n kubeflow -o wide
+
+# Check Pod Logs
+kubectl logs -n kubeflow <pod-name>
+```
+
+#### 3. Common Issues and Solutions
+
+##### Issue: Pods in Pending State
+```bash
+# Check Pod Details
+kubectl describe pod <pod-name> -n kubeflow
+
+# Check Node Resources
+kubectl describe nodes
+
+# Check Events
+kubectl get events -n kubeflow
+```
+
+##### Issue: Pipeline API Connection
+```bash
+# Test API Connection
+curl http://localhost:8888/healthz
+
+# Check API Pod
+kubectl get pods -n kubeflow | grep ml-pipeline
+
+# Check API Logs
+kubectl logs -n kubeflow <ml-pipeline-pod-name>
+```
+
+##### Issue: UI Access
+```bash
+# Check UI Service
+kubectl get svc -n kubeflow | grep ui
+
+# Port Forward UI
+kubectl port-forward -n kubeflow svc/ml-pipeline-ui 8080:80
+
+# Check UI Pod
+kubectl get pods -n kubeflow | grep ui
+```
+
+### 4. Resource Management
+
+#### Check Resource Usage
+```bash
+# Check Node Resources
+kubectl top nodes
+
+# Check Pod Resources
+kubectl top pods -n kubeflow
+
+# Check Container Resources
+kubectl top pods -n kubeflow --containers
+```
+
+#### Clean Up Resources
+```bash
+# Delete Failed Pods
+kubectl delete pod <pod-name> -n kubeflow
+
+# Clean Up Completed Jobs
+kubectl delete jobs --field-selector status.successful=1 -n kubeflow
+
+# Clean Up Old Pipeline Runs
+kubectl delete pipeline <pipeline-name> -n kubeflow
+```
+
+### 5. Logging and Debugging
+
+#### View Logs
+```bash
+# View Pod Logs
+kubectl logs <pod-name> -n kubeflow
+
+# View Previous Container Logs
+kubectl logs <pod-name> -n kubeflow --previous
+
+# View Logs with Timestamps
+kubectl logs <pod-name> -n kubeflow --timestamps
+```
+
+#### Debug Pods
+```bash
+# Describe Pod
+kubectl describe pod <pod-name> -n kubeflow
+
+# Exec into Pod
+kubectl exec -it <pod-name> -n kubeflow -- /bin/bash
+
+# Check Pod Events
+kubectl get events -n kubeflow --sort-by='.lastTimestamp'
+```
+
+### 6. Backup and Restore
+
+#### Backup Pipeline
+```bash
+# Export Pipeline
+kubectl get pipeline <pipeline-name> -n kubeflow -o yaml > pipeline-backup.yaml
+
+# Export All Pipelines
+kubectl get pipelines -n kubeflow -o yaml > all-pipelines-backup.yaml
+```
+
+#### Restore Pipeline
+```bash
+# Apply Pipeline
+kubectl apply -f pipeline-backup.yaml
+
+# Apply All Pipelines
+kubectl apply -f all-pipelines-backup.yaml
+```
+
 ## Features
 
 - 🔄 Simple multiplication pipeline
@@ -139,9 +397,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-- **Your Name** - [@yourtwitter](https://twitter.com/yourtwitter)
-- **Email** - your.email@example.com
-- **Project Link** - [https://github.com/yourusername/llmops](https://github.com/yourusername/llmops)
+- **LinkedIn** - [Ratnesh Kushwaha](http://linkedin.com/in/ratneshkushwaha/)
+- **YouTube** - [India Analytica](https://www.youtube.com/@IndiaAnalytica)
+- **Project Link** - [https://github.com/imratnesh/llmops](https://github.com/imratnesh/llmops)
+
+## Connect With Me
+
+### Professional Profiles
+- [LinkedIn Profile](http://linkedin.com/in/ratneshkushwaha/) - Connect with me on LinkedIn for professional networking and updates
+- [YouTube Channel](https://www.youtube.com/@IndiaAnalytica) - Subscribe to my YouTube channel for tutorials and tech content
+
+### Social Media
+- **GitHub** - [@imratnesh](https://github.com/imratnesh)
+- **Project Repository** - [llmops](https://github.com/imratnesh/llmops)
 
 ---
 
